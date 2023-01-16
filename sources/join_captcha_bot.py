@@ -44,7 +44,7 @@ from random import choice, randint
 import re
 
 # High Level Files Utils Library
-from shutil import rmtree
+from shutil import rmtree, copy2
 
 # System Library
 from sys import argv as sys_argv
@@ -465,6 +465,9 @@ def initialize_resources():
     # Create data directory if it does not exists
     if not path.exists(CONST["CHATS_DIR"]):
         makedirs(CONST["CHATS_DIR"])
+    # Copy default 'ukrainer.json' if it does not exists
+    if not path.exists(CONST["F_UKRAINER"]):
+        copy2("ukrainer.json", CONST["F_UKRAINER"])
     else:
         # If chats directory exists, check all subdirs names (chats ID)
         files = listdir(CONST["CHATS_DIR"])
@@ -1065,6 +1068,55 @@ def chat_member_status_change(update: Update, context: CallbackContext):
                     "user_id": join_user_id,
                     "correct_option": poll_correct_option
                 }
+            }
+            context.bot_data.update(poll_data)
+    elif captcha_mode == "ukrainer":
+        import ukrainer
+        '''
+        poll_question = get_chat_config(chat_id, "Poll_Q")
+        poll_options = get_chat_config(chat_id, "Poll_A")
+        poll_correct_option = get_chat_config(chat_id, "Poll_C_A")
+        '''
+        _poll = ukrainer.get_poll()
+        poll_question = _poll["Poll_Q"]
+        poll_options = _poll["Poll_A"]
+        poll_correct_option = _poll["Poll_C_A"]
+        if ((poll_question == "") or
+                (num_config_poll_options(poll_options) < 2) or
+                (poll_correct_option == 0)):
+            tlg_send_selfdestruct_msg_in(
+                bot, chat_id, TEXT[lang]["POLL_NEW_USER_NOT_CONFIG"],
+                CONST["T_FAST_DEL_MSG"])
+            return
+        # Remove empty strings from options list
+        poll_options = list(filter(None, poll_options))
+        # Send request to solve the poll text message
+        poll_request_msg_text = TEXT[lang]["POLL_NEW_USER"].format(
+            join_user_name, chat_title, timeout_str)
+        sent_result = tlg_send_selfdestruct_msg(
+            bot, chat_id, poll_request_msg_text)
+        solve_poll_request_msg_id = None
+        if sent_result is not None:
+            solve_poll_request_msg_id = sent_result
+        # Send the Poll
+        sent_result = tlg_send_poll(
+            bot, chat_id, poll_question, poll_options,
+            poll_correct_option - 1, captcha_timeout, False, Poll.QUIZ)
+        if sent_result["msg"] is None:
+            send_problem = True
+        else:
+            # Save some info about the poll the bot_data for
+            # later use in receive_quiz_answer
+            poll_id = sent_result["msg"].poll.id
+            poll_msg_id = sent_result["msg"].message_id
+            poll_data = {
+                poll_id:
+                    {
+                        "chat_id": chat_id,
+                        "poll_msg_id": poll_msg_id,
+                        "user_id": join_user_id,
+                        "correct_option": poll_correct_option
+                    }
             }
             context.bot_data.update(poll_data)
     else:  # Image captcha
@@ -2293,7 +2345,7 @@ def cmd_captcha_mode(update: Update, context: CallbackContext):
     # Get and configure chat to provided captcha mode
     new_captcha_mode = args[0].lower()
     if (new_captcha_mode in
-            {"poll", "button", "nums", "hex", "ascii", "math", "random"}):
+            {"poll", "button", "nums", "hex", "ascii", "math", "random", "ukrainer"}):
         save_config_property(group_id, "Captcha_Chars_Mode", new_captcha_mode)
         bot_msg = TEXT[lang]["CAPTCHA_MODE_CHANGE"].format(new_captcha_mode)
     else:

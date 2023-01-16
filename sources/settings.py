@@ -71,6 +71,9 @@ SETTINGS = {
     # and cause overload)
     "CAPTCHABOT_F_BAN_GROUPS": SCRIPT_PATH + "/data/bannedgroups.txt",
 
+    # Ukraine specific question for ban russists
+    "CAPTCHABOT_F_UKRAINER": SCRIPT_PATH + "/data/ukrainer.json",
+
     # Initial language at Bot start
     "CAPTCHABOT_INIT_LANG": "EN",
 

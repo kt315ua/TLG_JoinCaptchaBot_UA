@@ -92,6 +92,11 @@ CONST = {
         os_getenv("CAPTCHABOT_F_BAN_GROUPS", \
             SETTINGS["CAPTCHABOT_F_BAN_GROUPS"]),
 
+    # Ukraine specific question for ban russists
+    "F_UKRAINER": \
+        os_getenv("CAPTCHABOT_F_UKRAINER", \
+            SETTINGS["CAPTCHABOT_F_UKRAINER"]),
+
     # Initial enable/disable status at Bot start
     "INIT_ENABLE": \
         bool(int(os_getenv("CAPTCHABOT_INIT_ENABLE", \
