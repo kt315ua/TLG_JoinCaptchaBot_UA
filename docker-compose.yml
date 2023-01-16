@@ -1,0 +1,31 @@
+# This docker-compose file is used in production. For local development
+# run_backend.py and run_server_rpc.py script are executed in the python venv.
+
+version: "3.9"
+
+services:
+  UaCaptchaBot:
+    image: uacaptchabot:${TAG}
+    build:
+      dockerfile: docker/Dockerfile
+      context: .
+    container_name: UaCaptchaBot
+    hostname: UaCaptchaBot
+    environment:
+      - TAG=${TAG}
+      - CAPTCHABOT_PRIVATE=${CAPTCHABOT_PRIVATE}
+      - CAPTCHABOT_TOKEN=${CAPTCHABOT_TOKEN}
+      - CAPTCHABOT_OWNER=${CAPTCHABOT_OWNER}
+      - CAPTCHABOT_INIT_LANG=${CAPTCHABOT_INIT_LANG}
+      - CAPTCHABOT_INIT_CAPTCHA_TIME_MIN=${CAPTCHABOT_INIT_CAPTCHA_TIME_MIN}
+      - CAPTCHABOT_T_DEL_WELCOME_MSG=${CAPTCHABOT_T_DEL_WELCOME_MSG}
+      - CAPTCHABOT_MAX_FAIL_BAN_POLL=${CAPTCHABOT_MAX_FAIL_BAN_POLL}
+      - CAPTCHABOT_INIT_CAPTCHA_CHARS_MODE=${CAPTCHABOT_INIT_CAPTCHA_CHARS_MODE}
+    volumes:
+      - "${LOCAL_DATA_PATH}:/srv/app/src/data"
+    networks:
+      - UaCaptchaBot
+
+networks:
+    UaCaptchaBot:
+      name: UaCaptchaBot

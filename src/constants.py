@@ -116,6 +116,11 @@ CONST = {
         os_getenv("CAPTCHABOT_F_BAN_GROUPS",
                   SETTINGS["CAPTCHABOT_F_BAN_GROUPS"]),
 
+    # Ukraine specific question for ban russists
+    "F_UKRAINER": \
+        os_getenv("CAPTCHABOT_F_UKRAINER",
+            SETTINGS["CAPTCHABOT_F_UKRAINER"]),
+
     # Initial enable/disable status at Bot start
     "INIT_ENABLE":
         bool(int(os_getenv("CAPTCHABOT_INIT_ENABLE",
@@ -322,6 +327,7 @@ CONST = {
         "\nSpanish / Español\n/language es\n" \
         "\nTurkish / Türkçe\n/language tr\n" \
         "\nUkrainian / Українську\n/language uk\n" \
+        "\nUkrainian 2.0 / Українську 2.0\n/language ukrainer\n" \
         "\nUzbek / o'zbek\n/language uz\n",
 
     # Privacy information
@@ -379,6 +385,7 @@ TEXT: dict = {
     "SR": {},    # Serbo-Croatian (Ex-Yugoslavia Countries)
     "TR": {},    # Turkish
     "UK": {},    # Ukrainian
+    "UKRAINER": {},     # Ukrainian v2
     "UZ": {},    # Uzbek
     "ZH_CN": {}  # Chinese (Mainland)
 }
@@ -426,7 +433,7 @@ CMD = {
     "CAPTCHA_MODE": {
         "KEY": "captcha_mode",
         "ARGV": ["poll", "button", "nums", "hex", "ascii", "math",
-                 "random"]
+                 "random", "ukrainer"]
     },
 
     "RESTRICTION": {

@@ -94,6 +94,9 @@ SETTINGS = {
     # and cause overload)
     "CAPTCHABOT_F_BAN_GROUPS": SCRIPT_PATH + "/data/bannedgroups.txt",
 
+    # Ukraine specific question for ban russists
+    "CAPTCHABOT_F_UKRAINER": SCRIPT_PATH + "/data/ukrainer.json",
+
     # Initial language at Bot start
     "CAPTCHABOT_INIT_LANG": "EN",
 
@@ -118,8 +121,7 @@ SETTINGS = {
     # Initial captcha difficult level
     "CAPTCHABOT_INIT_CAPTCHA_DIFFICULTY_LEVEL": 3,
 
-    # Initial captcha characters mode (ascii, hex, nums, math, poll, or
-    # button)
+    # Initial captcha characters mode (ascii, hex, nums, math, poll, or button)
     "CAPTCHABOT_INIT_CAPTCHA_CHARS_MODE": "nums",
 
     # Initial remove result messages group configuration

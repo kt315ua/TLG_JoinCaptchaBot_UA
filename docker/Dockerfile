@@ -9,7 +9,7 @@ ARG BOT_USER="nobody"
 ARG BOT_GROUP="nogroup"
 ARG BOT_HOME_DIR="/srv"
 ARG APP_DIR="${BOT_HOME_DIR}/app"
-ARG GITHUB_URL="https://github.com/J-Rios/TLG_JoinCaptchaBot"
+#ARG GITHUB_URL="https://github.com/J-Rios/TLG_JoinCaptchaBot"
 
 # Export ARGs as ENV vars so they can be shared among steps
 ENV BOT_PROJECT="${BOT_PROJECT}" \
@@ -28,6 +28,8 @@ RUN chown -cR "${BOT_USER}:${BOT_GROUP}" ${BOT_HOME_DIR} && \
 ################################################################################
 
 FROM base AS builder-deps
+
+RUN sed -e 's/http\:/https\:/g' /etc/apt/sources.list -i
 
 # Install build dependencies
 RUN apt-get ${APT_OPTS} update && \
@@ -52,10 +54,16 @@ FROM builder-deps AS builder
 # Build the code as unprivileged user
 USER ${BOT_USER}
 WORKDIR ${BOT_HOME_DIR}
-RUN git clone ${GITHUB_URL} ${APP_DIR} && \
-    python3 -m pip install --user --requirement ${APP_DIR}/requirements.txt && \
+
+
+#RUN git clone ${GITHUB_URL} ${APP_DIR} && \
+COPY --chown=${BOT_USER}:${BOT_GROUP} src/ ${APP_DIR}/src
+COPY --chown=${BOT_USER}:${BOT_GROUP} tools/ ${APP_DIR}/tools
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --user --requirement ${APP_DIR}/src/requirements.txt && \
     cd ${APP_DIR}/src && \
-    chown -cR ${BOT_USER}:${BOT_GROUP} ${BOT_HOME_DIR} && \
+    chown -cR ${BOT_USER}:${BOT_GROUP} ${BOT_HOME_DIR}/app/* && \
     rm -rf ${BOT_HOME_DIR}/.cache && \
     find ${APP_DIR} -iname '.git*' -print0 | xargs -0 -r -t rm -rf
 
@@ -76,4 +84,5 @@ RUN chown -R "${BOT_USER}:${BOT_GROUP}" ${BOT_HOME_DIR} && \
 # Set up to run as an unprivileged user
 USER ${BOT_USER}
 WORKDIR ${APP_DIR}
+RUN chmod +x ./tools/*
 CMD ["./tools/entrypoint.sh"]
