@@ -339,5 +339,6 @@ TEXT = {
     "SK": {}, # Slovak
     "TR": {}, # Turkish
     "UK": {}, # Ukrainian
+    "UKRAINER": {}, # Ukrainian v2
     "ZH_CN": {} # Chinese (Mainland)
 }
