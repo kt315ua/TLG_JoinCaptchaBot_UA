@@ -121,6 +121,9 @@ from constants import (
 # Thread-Safe JSON Library
 from tsjson import TSjson
 
+# Local "Ukrainer" extension
+import ukrainer
+
 
 ###############################################################################
 # Logger Setup
@@ -1071,7 +1074,6 @@ def chat_member_status_change(update: Update, context: CallbackContext):
             }
             context.bot_data.update(poll_data)
     elif captcha_mode == "ukrainer":
-        import ukrainer
         '''
         poll_question = get_chat_config(chat_id, "Poll_Q")
         poll_options = get_chat_config(chat_id, "Poll_A")
@@ -1208,7 +1210,7 @@ def chat_member_status_change(update: Update, context: CallbackContext):
         if sent_result["msg"]:
             Global.new_users[chat_id][join_user_id]["msg_to_rm"].append(
                     sent_result["msg"].message_id)
-        if ((captcha_mode == "poll") and
+        if ((captcha_mode == "poll" or captcha_mode == "ukrainer") and
                 (solve_poll_request_msg_id is not None)):
             Global.new_users[chat_id][join_user_id]["msg_to_rm"].append(
                         solve_poll_request_msg_id)
