@@ -1079,48 +1079,50 @@ def chat_member_status_change(update: Update, context: CallbackContext):
         poll_options = get_chat_config(chat_id, "Poll_A")
         poll_correct_option = get_chat_config(chat_id, "Poll_C_A")
         '''
-        _poll = ukrainer.get_poll()
-        poll_question = _poll["Poll_Q"]
-        poll_options = _poll["Poll_A"]
-        poll_correct_option = _poll["Poll_C_A"]
-        if ((poll_question == "") or
-                (num_config_poll_options(poll_options) < 2) or
-                (poll_correct_option == 0)):
-            tlg_send_selfdestruct_msg_in(
-                bot, chat_id, TEXT[lang]["POLL_NEW_USER_NOT_CONFIG"],
-                CONST["T_FAST_DEL_MSG"])
-            return
-        # Remove empty strings from options list
-        poll_options = list(filter(None, poll_options))
-        # Send request to solve the poll text message
-        poll_request_msg_text = TEXT[lang]["POLL_NEW_USER"].format(
-            join_user_name, chat_title, timeout_str)
-        sent_result = tlg_send_selfdestruct_msg(
-            bot, chat_id, poll_request_msg_text)
-        solve_poll_request_msg_id = None
-        if sent_result is not None:
-            solve_poll_request_msg_id = sent_result
-        # Send the Poll
-        sent_result = tlg_send_poll(
-            bot, chat_id, poll_question, poll_options,
-            poll_correct_option - 1, captcha_timeout, False, Poll.QUIZ)
-        if sent_result["msg"] is None:
-            send_problem = True
-        else:
-            # Save some info about the poll the bot_data for
-            # later use in receive_quiz_answer
-            poll_id = sent_result["msg"].poll.id
-            poll_msg_id = sent_result["msg"].message_id
-            poll_data = {
-                poll_id:
-                    {
-                        "chat_id": chat_id,
-                        "poll_msg_id": poll_msg_id,
-                        "user_id": join_user_id,
-                        "correct_option": poll_correct_option
-                    }
-            }
-            context.bot_data.update(poll_data)
+        for _ in range(0, 3):
+            _poll = ukrainer.get_poll()
+            poll_question = _poll["Poll_Q"]
+            poll_options = _poll["Poll_A"]
+            poll_correct_option = _poll["Poll_C_A"]
+            if ((poll_question == "") or
+                    (num_config_poll_options(poll_options) < 2) or
+                    (poll_correct_option == 0)):
+                tlg_send_selfdestruct_msg_in(
+                    bot, chat_id, TEXT[lang]["POLL_NEW_USER_NOT_CONFIG"],
+                    CONST["T_FAST_DEL_MSG"])
+                return
+            # Remove empty strings from options list
+            poll_options = list(filter(None, poll_options))
+            # Send request to solve the poll text message
+            if _ == 0:
+                poll_request_msg_text = TEXT[lang]["POLL_NEW_USER"].format(
+                    join_user_name, chat_title, timeout_str)
+                sent_result = tlg_send_selfdestruct_msg(
+                    bot, chat_id, poll_request_msg_text)
+                solve_poll_request_msg_id = None
+                if sent_result is not None:
+                    solve_poll_request_msg_id = sent_result
+            # Send the Poll
+            sent_result = tlg_send_poll(
+                bot, chat_id, poll_question, poll_options,
+                poll_correct_option - 1, captcha_timeout, False, Poll.QUIZ)
+            if sent_result["msg"] is None:
+                send_problem = True
+            else:
+                # Save some info about the poll the bot_data for
+                # later use in receive_quiz_answer
+                poll_id = sent_result["msg"].poll.id
+                poll_msg_id = sent_result["msg"].message_id
+                poll_data = {
+                    poll_id:
+                        {
+                            "chat_id": chat_id,
+                            "poll_msg_id": poll_msg_id,
+                            "user_id": join_user_id,
+                            "correct_option": poll_correct_option
+                        }
+                }
+                context.bot_data.update(poll_data)
     else:  # Image captcha
         # Generate a pseudorandom captcha send it to telegram group and
         # program message
