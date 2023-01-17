@@ -341,5 +341,6 @@ TEXT: dict = {
     "TR": {}, # Turkish
     "UK": {}, # Ukrainian
     "UZ": {}, # Uzbek
+    "UKRAINER": {}, # Ukrainian v2
     "ZH_CN": {} # Chinese (Mainland)
 }
