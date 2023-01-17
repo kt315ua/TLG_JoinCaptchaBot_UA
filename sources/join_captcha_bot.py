@@ -1184,7 +1184,7 @@ async def chat_member_status_change(
         # Restrict user to deny send any kind of message until captcha
         # is solve. Allow send text messages for image based captchas
         # that requires it
-        if captcha_mode in ["poll", "button"]:
+        if captcha_mode in ["poll", "button", "ukrainer"]:
             await tlg_restrict_user(
                     bot, chat_id, join_user_id, send_msg=False,
                     send_media=False, send_stickers_gifs=False,
