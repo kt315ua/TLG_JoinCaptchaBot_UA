@@ -1588,20 +1588,21 @@ def receive_poll_answer(update: Update, context: CallbackContext):
     # process
     if from_user.id != poll_data["user_id"]:
         return
+    # Handle poll vote
+    chat_id = poll_data["chat_id"]
+    user_id = poll_data["user_id"]
+    poll_msg_id = poll_data["poll_msg_id"]
+    poll_correct_option = poll_data["correct_option"]
 
     # Get pending polls for userid
     polls_left = 0
     for poll_id in active_polls.keys():
         if from_user.id == active_polls[poll_id]["user_id"]:
             polls_left += 1
-    logger.info("User %s have %d polls",
-            from_user.username, polls_left)
+            if option_answer == poll_correct_option:
+                polls_left -= 1
+    logger.info("User %s have %d polls", from_user.username, polls_left)
 
-    # Handle poll vote
-    chat_id = poll_data["chat_id"]
-    user_id = poll_data["user_id"]
-    poll_msg_id = poll_data["poll_msg_id"]
-    poll_correct_option = poll_data["correct_option"]
     # The vote come from expected user, let's stop the Poll
     logger.info(
             "[%s] User %s select poll option %d",
@@ -1620,69 +1621,70 @@ def receive_poll_answer(update: Update, context: CallbackContext):
     restrict_non_text_msgs = get_chat_config(chat_id, "Restrict_Non_Text")
     # Wait 3s to let poll animation be shown
     sleep(3)
-    # Remove previous join messages
-    for msg in Global.new_users[chat_id][user_id]["msg_to_rm"]:
-        delete_tlg_msg(bot, chat_id, msg)
-    Global.new_users[chat_id][user_id]["msg_to_rm"].clear()
-    # Check if user vote the correct option
-    if option_answer == poll_correct_option:
-        logger.info("[%s] User %s solve a poll challenge.", chat_id, user_name)
-        # Remove all restrictions on the user
-        tlg_unrestrict_user(bot, chat_id, user_id)
-        # Send captcha solved message
-        bot_msg = TEXT[lang]["CAPTCHA_SOLVED"].format(user_name)
-        if rm_result_msg:
-            tlg_send_selfdestruct_msg_in(
-                    bot, chat_id, bot_msg, CONST["T_FAST_DEL_MSG"])
-        else:
-            tlg_send_msg(bot, chat_id, bot_msg)
-        del Global.new_users[chat_id][user_id]
-        # Check for custom welcome message and send it
-        if welcome_msg != "-":
-            if rm_welcome_msg:
-                welcome_msg_time = get_chat_config(chat_id, "Welcome_Time")
-                sent_result = tlg_send_selfdestruct_msg_in(
-                        bot, chat_id, welcome_msg, welcome_msg_time,
-                        parse_mode="MARKDOWN")
+    if polls_left == 0:
+        # Remove previous join messages
+        for msg in Global.new_users[chat_id][user_id]["msg_to_rm"]:
+            delete_tlg_msg(bot, chat_id, msg)
+        Global.new_users[chat_id][user_id]["msg_to_rm"].clear()
+        # Check if user vote the correct option
+        if option_answer == poll_correct_option:
+            logger.info("[%s] User %s solve a poll challenge.", chat_id, user_name)
+            # Remove all restrictions on the user
+            tlg_unrestrict_user(bot, chat_id, user_id)
+            # Send captcha solved message
+            bot_msg = TEXT[lang]["CAPTCHA_SOLVED"].format(user_name)
+            if rm_result_msg:
+                tlg_send_selfdestruct_msg_in(
+                        bot, chat_id, bot_msg, CONST["T_FAST_DEL_MSG"])
             else:
-                sent_result = tlg_send_msg(
-                        bot, chat_id, welcome_msg, "MARKDOWN")
-            if sent_result is None:
-                logger.info(
-                        "[%s] Error: Can't send the welcome message.",
-                        chat_id)
-        # Check for send just text message option and apply user
-        # restrictions
-        if restrict_non_text_msgs == 1:  # Restrict for 1 day
-            tomorrow_epoch = get_unix_epoch() + CONST["T_RESTRICT_NO_TEXT_MSG"]
-            tlg_restrict_user(
-                    bot, chat_id, user_id, send_msg=True, send_media=False,
-                    send_stickers_gifs=False, insert_links=False,
-                    send_polls=False, invite_members=False, pin_messages=False,
-                    change_group_info=False,  manage_topics=None,
-                    until_date=tomorrow_epoch)
-        elif restrict_non_text_msgs == 2:  # Restrict forever
-            tlg_restrict_user(
-                    bot, chat_id, user_id, send_msg=True, send_media=False,
-                    send_stickers_gifs=False, insert_links=False,
-                    send_polls=False, invite_members=False, pin_messages=False,
-                    change_group_info=False, manage_topics=None)
-    else:
-        # Notify captcha fail
-        logger.info("[%s] User %s fail poll.", chat_id, user_name)
-        bot_msg = TEXT[lang]["CAPTCHA_POLL_FAIL"].format(user_name)
-        if rm_result_msg:
-            tlg_send_selfdestruct_msg_in(
-                bot, chat_id, bot_msg, CONST["T_FAST_DEL_MSG"])
+                tlg_send_msg(bot, chat_id, bot_msg)
+            del Global.new_users[chat_id][user_id]
+            # Check for custom welcome message and send it
+            if welcome_msg != "-":
+                if rm_welcome_msg:
+                    welcome_msg_time = get_chat_config(chat_id, "Welcome_Time")
+                    sent_result = tlg_send_selfdestruct_msg_in(
+                            bot, chat_id, welcome_msg, welcome_msg_time,
+                            parse_mode="MARKDOWN")
+                else:
+                    sent_result = tlg_send_msg(
+                            bot, chat_id, welcome_msg, "MARKDOWN")
+                if sent_result is None:
+                    logger.info(
+                            "[%s] Error: Can't send the welcome message.",
+                            chat_id)
+            # Check for send just text message option and apply user
+            # restrictions
+            if restrict_non_text_msgs == 1:  # Restrict for 1 day
+                tomorrow_epoch = get_unix_epoch() + CONST["T_RESTRICT_NO_TEXT_MSG"]
+                tlg_restrict_user(
+                        bot, chat_id, user_id, send_msg=True, send_media=False,
+                        send_stickers_gifs=False, insert_links=False,
+                        send_polls=False, invite_members=False, pin_messages=False,
+                        change_group_info=False,  manage_topics=None,
+                        until_date=tomorrow_epoch)
+            elif restrict_non_text_msgs == 2:  # Restrict forever
+                tlg_restrict_user(
+                        bot, chat_id, user_id, send_msg=True, send_media=False,
+                        send_stickers_gifs=False, insert_links=False,
+                        send_polls=False, invite_members=False, pin_messages=False,
+                        change_group_info=False, manage_topics=None)
         else:
-            tlg_send_msg(bot, chat_id, bot_msg)
-        # Wait 10s
-        sleep(10)
-        # Try to kick the user
-        captcha_fail_kick_ban_member(
-                bot, chat_id, user_id, CONST["MAX_FAIL_BAN_POLL"])
-    logger.info("[%s] Poll captcha process completed.", chat_id)
-    logger.info("")
+            # Notify captcha fail
+            logger.info("[%s] User %s fail poll.", chat_id, user_name)
+            bot_msg = TEXT[lang]["CAPTCHA_POLL_FAIL"].format(user_name)
+            if rm_result_msg:
+                tlg_send_selfdestruct_msg_in(
+                    bot, chat_id, bot_msg, CONST["T_FAST_DEL_MSG"])
+            else:
+                tlg_send_msg(bot, chat_id, bot_msg)
+            # Wait 10s
+            sleep(10)
+            # Try to kick the user
+            captcha_fail_kick_ban_member(
+                    bot, chat_id, user_id, CONST["MAX_FAIL_BAN_POLL"])
+        logger.info("[%s] Poll captcha process completed.", chat_id)
+        logger.info("")
 
 
 def key_inline_keyboard(update: Update, context: CallbackContext):
