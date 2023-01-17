@@ -1588,6 +1588,15 @@ def receive_poll_answer(update: Update, context: CallbackContext):
     # process
     if from_user.id != poll_data["user_id"]:
         return
+
+    # Get pending polls for userid
+    polls_left = 0
+    for poll_id in active_polls.keys():
+        if from_user.id == active_polls[poll_id]["user_id"]:
+            polls_left += 1
+    logger.info("User %s have %d polls",
+            from_user.username, polls_left)
+
     # Handle poll vote
     chat_id = poll_data["chat_id"]
     user_id = poll_data["user_id"]
