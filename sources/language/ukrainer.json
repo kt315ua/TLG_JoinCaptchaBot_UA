@@ -12,7 +12,7 @@
         "Цю команду може використовувати лише адміністратор.",
 
     "LANG_CHANGE":
-        "Мова змінена на Українську.",
+        "Мова змінена на Українську v2.0.",
 
     "LANG_SAME":
         "Я вже спілкуюся Українською.\n\nПідтримувані мови:\n{}",
@@ -54,10 +54,10 @@
         "Режим капчі успішно змінено на \"{}\".",
 
     "CAPTCHA_MODE_INVALID":
-        "Недійсний режим капчі. Підтримувані режими: \"nums\", \"hex\", \"ascii\", \"math\", \"button\", \"poll\" та \"random\".\n\nПриклад:\n/captcha_mode nums\n/captcha_mode hex\n/captcha_mode ascii\n/captcha_mode math\n/captcha_mode button\n/captcha_mode poll\n/captcha_mode random\n/captcha_mode ukrainer",
+        "Недійсний режим капчі. Підтримувані режими: \"nums\", \"hex\", \"ascii\", \"math\", \"button\", \"poll\", \"ukrainer\" та \"random\".\n\nПриклад:\n/captcha_mode nums\n/captcha_mode hex\n/captcha_mode ascii\n/captcha_mode math\n/captcha_mode button\n/captcha_mode poll\n/captcha_mode random\n/captcha_mode ukrainer",
 
     "CAPTCHA_MODE_NOT_ARG":
-        "Для встановлення команди потрібен режим. Доступні режими:\n- Цифрова капча (\"nums\").\n- Шістнадцяткова капча, цифри та символи A-F (\"hex\").\n- Цифри та символи A-Z капча (\"ascii\").\n- Math equation to be solved Captchas (\"math\").\n- Лише кнопка (\"button\").\n- Custom Poll challenge (\"poll\").\n- Random challenge (\"random\").\n\nПриклади:\n/captcha_mode nums\n/captcha_mode hex\n/captcha_mode ascii\n/captcha_mode math\n/captcha_mode button\n/captcha_mode poll\n/captcha_mode random",
+        "Для встановлення команди потрібен режим. Доступні режими:\n- Цифрова капча (\"nums\").\n- Шістнадцяткова капча, цифри та символи A-F (\"hex\").\n- Цифри та символи A-Z капча (\"ascii\").\n- Math equation to be solved Captchas (\"math\").\n- Лише кнопка (\"button\").\n- Custom Poll challenge (\"poll\").\n- Random challenge (\"random\").\n\nПриклади:\n/captcha_mode nums\n/captcha_mode hex\n/captcha_mode ascii\n/captcha_mode math\n/captcha_mode button\n/captcha_mode poll\n/captcha_mode random\n/captcha_mode ukrainer",
 
     "WELCOME_MSG_SET":
         "Вітальне повідомлення успішно налаштовано.",
@@ -225,7 +225,7 @@
         "Привіт, {}, ласкаво просимо в {}. Будь ласка, дайте відповідь на питання нижче, щоб підтвердити, що ви нормальна людина. Якщо ви не зробите цього протягом {}, ви будете автоматично видалені з групи.\n\nІнформація про ваш профіль, IP та відповідь буде надіслана до СБУ! Слава Україні!",
 
     "CAPTCHA_POLL_FAIL":
-        "Капча - відповідь на питання не вирішено, {} обрав невірний варіант. Ви будете виключені з групи через 10 сек. Будь-ласка, спробуйте зайти в групу знову... Інформація щодо Вас буде надіслана до СБУ! Чекайте на дзвінок!",
+        "Капча - відповідь на питання не вирішено, {} обрав невірний варіант. Ви будете виключені з групи через 10 сек. Будь-ласка, спробуйте зайти в групу знову...\n\nІнформація щодо Вас буде надіслана до СБУ! Чекайте на дзвінок!",
 
     "CAPTCHA_POLL_USAGE":
         "Налаштування Капчі - відповіді на питання і параметри опитування \n----------------\nТекст питання не може бути довшим {} символів.\n\nВаріант опитування не може бути більше, ніж {} символів.\n\nМаксімальное кількість опцій {}.\n----------------\nЗадайте питання для опитування:\n/captcha_poll question Ви впевнені, що хочете увійти в цю групу?\n\nВстановити варіант опитування 1:\n/captcha_poll option 1 Ні, я не хочу входити в групу.\n\nУстановіть варіант опитування 2:\n/captcha_poll option 2 Так, я людина і хочу увійти в групу.\n\nВстановити варіант опитування 3:\n/captcha_poll option 3 Хто я і що я роблю?\n\nВидалити варіант опитування 2:\n/captcha_poll option 2 remove\n\nВстановити правильний варіант опитування 2:\n/captcha_poll correct_option 2\n\nЗаміна режиму в Капча - відповідь на питання:\n/captcha_mode poll",
