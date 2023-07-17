@@ -1054,7 +1054,7 @@ async def chat_member_status_change(
         if ((poll_question == "") or
                 (num_config_poll_options(poll_options) < 2) or
                 (poll_correct_option == 0)):
-            tlg_send_selfdestruct_msg_in(
+            await tlg_send_autodelete_msg(
                 bot, chat_id, TEXT[lang]["POLL_NEW_USER_NOT_CONFIG"],
                 CONST["T_FAST_DEL_MSG"])
             return
@@ -1063,15 +1063,16 @@ async def chat_member_status_change(
         # Send request to solve the poll text message
         poll_request_msg_text = TEXT[lang]["POLL_NEW_USER"].format(
             join_user_name, chat_title, timeout_str)
-        sent_result = tlg_send_selfdestruct_msg_in(
+        sent_result = await tlg_send_autodelete_msg(
             bot, chat_id, poll_request_msg_text, captcha_timeout)
         solve_poll_request_msg_id = None
         if sent_result is not None:
             solve_poll_request_msg_id = sent_result
         # Send the Poll
-        sent_result = tlg_send_poll(
+        sent_result = await tlg_send_poll(
             bot, chat_id, poll_question, poll_options,
-            poll_correct_option - 1, captcha_timeout, False, Poll.QUIZ)
+            poll_correct_option - 1, captcha_timeout, False, Poll.QUIZ,
+            read_timeout=20)
         if sent_result["msg"] is None:
             send_problem = True
         else:
