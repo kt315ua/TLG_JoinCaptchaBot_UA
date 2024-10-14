@@ -53,6 +53,7 @@ from sys import exit as sys_exit
 
 # Time Library
 from time import time
+from time import sleep
 
 # Error Traceback Library
 from traceback import format_exc
@@ -1106,6 +1107,7 @@ async def chat_member_status_change(
         timeout_str = f'{int(captcha_timeout / CONST["T_SECONDS_IN_MIN"])} min'
     send_problem = False
     captcha_num = ""
+
     if captcha_mode == "random":
         captcha_mode = choice(["nums", "math", "poll"])
         # If Captcha Mode Poll is not configured use another mode
@@ -1117,6 +1119,24 @@ async def chat_member_status_change(
                     (num_config_poll_options(poll_options) < 2) or
                     (poll_correct_option == 0)):
                 captcha_mode = choice(["nums", "math"])
+
+    # Restrict user to deny send any kind of message until captcha
+    # is solve. Allow send text messages for image based captchas
+    # that requires it
+    if captcha_mode in ["poll", "button", "ukrainer"]:
+        logger.info(f"[{chat_id}] Mute user: {join_user_name} ({join_user_id})")
+        await restrict_user_mute(bot, chat_id, join_user_id)
+    else:  # Restrict user to only allow send text messages
+        logger.info(f"[{chat_id}] Text only for user: {join_user_name} ({join_user_id})")
+        await restrict_user_media(bot, chat_id, join_user_id)
+
+    if captcha_mode == "poll" or captcha_mode == "ukrainer":
+        logger.info(f"[{chat_id}] Delay 5 sec for captcha mode: {captcha_mode}...(WA: TG sync history issue)")
+        sleep(5)
+    else:
+        logger.info(f"[{chat_id}] Delay 1 sec for captcha mode: {captcha_mode}...(WA: TG sync history issue)")
+        sleep(1)
+
     if captcha_mode == "button":
         # Send a button-only challenge
         challenge_text = TEXT[lang]["NEW_USER_BUTTON_MODE"].format(
@@ -1348,13 +1368,13 @@ async def chat_member_status_change(
                 (solve_poll_request_msg_id is not None)):
             Global.new_users[chat_id][join_user_id]["msg_to_rm"].append(
                     solve_poll_request_msg_id)
-        # Restrict user to deny send any kind of message until captcha
-        # is solve. Allow send text messages for image based captchas
-        # that requires it
-        if captcha_mode in ["poll", "button", "ukrainer"]:
-            await restrict_user_mute(bot, chat_id, join_user_id)
-        else:  # Restrict user to only allow send text messages
-            await restrict_user_media(bot, chat_id, join_user_id)
+        ## Restrict user to deny send any kind of message until captcha
+        ## is solve. Allow send text messages for image based captchas
+        ## that requires it
+        #if captcha_mode in ["poll", "button", "ukrainer"]:
+        #    await restrict_user_mute(bot, chat_id, join_user_id)
+        #else:  # Restrict user to only allow send text messages
+        #    await restrict_user_media(bot, chat_id, join_user_id)
         logger.info("[%s] Captcha send process completed.", chat_id)
 
 
@@ -4133,10 +4153,8 @@ async def tlg_app_start(app: Application) -> None:
     This function is called at the startup of run_polling() or
     run_webhook() functions.'''
     # Launch delete messages and kick users coroutines
-    Global.async_captcha_timeout = \
-        asyncio_create_task(captcha_timeout(app.bot))
-    Global.async_auto_delete_messages = \
-        asyncio_create_task(auto_delete_messages(app.bot))
+    Global.async_captcha_timeout = asyncio_create_task(captcha_timeout(app.bot))
+    Global.async_auto_delete_messages = asyncio_create_task(auto_delete_messages(app.bot))
     logger.info("Auto-delete messages and captcha timeout coroutines started.")
 
 
