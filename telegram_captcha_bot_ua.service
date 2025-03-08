@@ -3,6 +3,8 @@ Description=TLGCaptchaBotUa: https://t.me/UaCaptchaBot
 Requires=docker.service
 BindsTo=docker.service
 Conflicts=shutdown.target reboot.target halt.target
+After=local-fs.target
+Wants=local-fs.target
 
 [Service]
 #Restart=always
